@@ -85,9 +85,9 @@ large weight loss (BMI change -5~-10)
 mild weight loss (BMI change -2~-5) 或是可以看那篇paper怎麼定義]
 ```{r}
 dif<-bmi_lastyr- bmi_now
-paste0("large weight loss: ",length(as.factor(subset(dif,dif>=5))),"人")
-paste0("mild weight loss: ",length(as.factor(subset(dif,dif<5& dif>=2))),"人")
-paste0("you are a big loser: ",length(as.factor(subset(dif,dif<2))),"人")
+paste0("large weight loss: ",length(subset(dif,dif>=5)),"人")
+paste0("mild weight loss: ",length(subset(dif,dif<5& dif>=2)),"人")
+paste0("you are a big loser: ",length(subset(dif,dif<2)),"人")
 
 ```
 

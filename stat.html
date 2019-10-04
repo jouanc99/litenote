@@ -448,11 +448,11 @@ summary(bmi_lastyr)</code></pre>
 ##   12.02   23.17   27.05   44.10   31.78 2003.54</code></pre>
 <p>用1yr ago跟now的BMI 選出1yr ago過重、肥胖的人、降低到正常體重的人，用降低幅度分組 [比如說 large weight loss (BMI change -5~-10) mild weight loss (BMI change -2~-5) 或是可以看那篇paper怎麼定義]</p>
 <pre class="r"><code>dif&lt;-bmi_lastyr- bmi_now
-paste0(&quot;large weight loss: &quot;,length(as.factor(subset(dif,dif&gt;=5))),&quot;人&quot;)</code></pre>
+paste0(&quot;large weight loss: &quot;,length(subset(dif,dif&gt;=5)),&quot;人&quot;)</code></pre>
 <pre><code>## [1] &quot;large weight loss: 298人&quot;</code></pre>
-<pre class="r"><code>paste0(&quot;mild weight loss: &quot;,length(as.factor(subset(dif,dif&lt;5&amp; dif&gt;=2))),&quot;人&quot;)</code></pre>
+<pre class="r"><code>paste0(&quot;mild weight loss: &quot;,length(subset(dif,dif&lt;5&amp; dif&gt;=2)),&quot;人&quot;)</code></pre>
 <pre><code>## [1] &quot;mild weight loss: 663人&quot;</code></pre>
-<pre class="r"><code>paste0(&quot;you are a big loser: &quot;,length(as.factor(subset(dif,dif&lt;2))),&quot;人&quot;)</code></pre>
+<pre class="r"><code>paste0(&quot;you are a big loser: &quot;,length(subset(dif,dif&lt;2)),&quot;人&quot;)</code></pre>
 <pre><code>## [1] &quot;you are a big loser: 5114人&quot;</code></pre>
 </div>
 </div>

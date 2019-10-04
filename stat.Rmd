@@ -19,25 +19,92 @@ setwd("C:/Users/Jouan/Desktop") #設在存統計xpt檔的位置
 stat_1 <- read.xport(file.choose())
 ```
 
-## WHD020
+## WHD020 WHD050(Current self-reported weight 、 Self-reported weight - 1 yr ago)
 取體重數值(單位：磅)，換算公斤（*0.45)
 ```{r}
+#now
 stat_2<-subset(stat_1, stat_1$WHD020<= 600,na.rm=TRUE)
-paste0(round(mean(stat_2$WHD020)*0.45),"KG") #體重平均值
-paste0(round(median(stat_2$WHD020)*0.45),"KG") #體重中位數
-summary(stat_2$WHD020)*0.45 #整體資料
+#體重平均值
+paste0(round(mean(stat_2$WHD020)*0.45)," KG") 
+#體重中位數
+paste0(round(median(stat_2$WHD020)*0.45)," KG") 
+
+#整體資料
+summary(stat_2$WHD020)*0.45 
+
+#1y ago
+stat_5<-subset(stat_1, stat_1$WHD050<= 600,na.rm=TRUE)
+#體重平均值
+paste0(round(mean(stat_5$WHD050)*0.45)," KG") 
+#體重中位數
+paste0(round(median(stat_5$WHD050)*0.45)," KG") 
+
+#整體資料
+summary(stat_5$WHD050)*0.45 
+
+
+#今年和前一年比較
+ddt<-cbind(stat_1$WHD020,stat_1$WHD050)
+ddt_1<-subset(ddt,ddt[,1]<=600,na.rm=TRUE)
+ddt_2<-subset(ddt_1,ddt_1[,2]<=600)*0.45
+summary(ddt_2)
+
 ```
 
-## WHD030
+## 算BMI
+
+使用資料：
+
+### WHD010 - Current self-reported height (inches)
+
+### WHD020 - Current self-reported weight (pounds)
+
+### WHD050 - Self-reported weight - 1 yr ago (pounds)
+
+1 inch = 0.0254 m；1 pound = 0.45 KG
+BMI = 體重(kg)/身高(m)^2
+```{r}
+dt<-cbind(stat_1$WHD010,stat_1$WHD020) #算今年bmi
+dt_1_1<-subset(dt,dt[,1]<=84 & dt[,2]<=600,na.rm=TRUE)
+dt_1_1_1<-dt_1_1[,1]*0.0254 #m
+dt_1_2_1<-dt_1_1[,2]*0.45 #kg
+bmi_now<-dt_1_2_1/(dt_1_1_1^2)
+summary(bmi_now)
+
+dt1<-cbind(stat_1$WHD010,stat_1$WHD050) #算前一年bmi
+dt_2_1<-subset(dt1,dt1[,1]<=84 & dt[,2]<=600,na.rm=TRUE)
+dt_2_1_1<-dt_2_1[,1]*0.0254 #m
+dt_2_2_1<-dt_2_1[,2]*0.45 #kg
+bmi_lastyr<-dt_2_2_1/(dt_2_1_1^2)
+summary(bmi_lastyr)
+
+```
+
+用1yr ago跟now的BMI 選出1yr ago過重、肥胖的人、降低到正常體重的人，用降低幅度分組 [比如說 
+large weight loss (BMI change -5~-10)
+mild weight loss (BMI change -2~-5) 或是可以看那篇paper怎麼定義]
+```{r}
+dif<-bmi_now- bmi_lastyr
+paste0("large weight loss: ",length(as.factor(subset(dif,dif>=5))),"人")
+paste0("mild weight loss: ",length(as.factor(subset(dif,dif<5& dif>=2))),"人")
+paste0("you are a big loser: ",length(as.factor(subset(dif,dif<2))),"人")
+
+```
+
+
+## WHQ030
 ### How do you consider your weight?
 1 = Overweight
 2 = Underweight, or
 3 = About the right weight?
 ```{r}
 table(stat_1$WHQ030)
-  #summary(as.factor(stat_1$WHQ030)) 也可以；將WHQ030從integer轉成factor(因為sum會把值加起來)
-
+  #summary(as.factor(stat_3$WHQ030)) 也可以；將WHQ030從integer轉成factor(因為sum會把值加起來)
 ```
 
+WHQ040跟WHQ030相似
+```{r}
+table(stat_1$WHQ040)
+```
 
 

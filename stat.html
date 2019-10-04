@@ -378,20 +378,86 @@ summary {
 setwd(&quot;C:/Users/Jouan/Desktop&quot;) #設在存統計xpt檔的位置
   #dir() 可以輸入這個，會跑出檔案位置的所有檔案，從裡面複製貼到下面的read.xport()，好處就是不用每次knit都要重選檔案
 stat_1 &lt;- read.xport(file.choose())</code></pre>
-<div id="whd020" class="section level2">
-<h2>WHD020</h2>
+<div id="whd020-whd050current-self-reported-weight-self-reported-weight---1-yr-ago" class="section level2">
+<h2>WHD020 WHD050(Current self-reported weight 、 Self-reported weight - 1 yr ago)</h2>
 <p>取體重數值(單位：磅)，換算公斤（*0.45)</p>
-<pre class="r"><code>stat_2&lt;-subset(stat_1, stat_1$WHD020&lt;= 600,na.rm=TRUE)
-paste0(round(mean(stat_2$WHD020)*0.45),&quot;KG&quot;) #體重平均值</code></pre>
-<pre><code>## [1] &quot;79KG&quot;</code></pre>
-<pre class="r"><code>paste0(round(median(stat_2$WHD020)*0.45),&quot;KG&quot;) #體重中位數</code></pre>
-<pre><code>## [1] &quot;76KG&quot;</code></pre>
-<pre class="r"><code>summary(stat_2$WHD020)*0.45 #整體資料</code></pre>
+<pre class="r"><code>#now
+stat_2&lt;-subset(stat_1, stat_1$WHD020&lt;= 600,na.rm=TRUE)
+#體重平均值
+paste0(round(mean(stat_2$WHD020)*0.45),&quot; KG&quot;) </code></pre>
+<pre><code>## [1] &quot;79 KG&quot;</code></pre>
+<pre class="r"><code>#體重中位數
+paste0(round(median(stat_2$WHD020)*0.45),&quot; KG&quot;) </code></pre>
+<pre><code>## [1] &quot;76 KG&quot;</code></pre>
+<pre class="r"><code>#整體資料
+summary(stat_2$WHD020)*0.45 </code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   33.75   64.35   76.50   79.07   90.00  270.00</code></pre>
+<pre class="r"><code>#1y ago
+stat_5&lt;-subset(stat_1, stat_1$WHD050&lt;= 600,na.rm=TRUE)
+#體重平均值
+paste0(round(mean(stat_5$WHD050)*0.45),&quot; KG&quot;) </code></pre>
+<pre><code>## [1] &quot;79 KG&quot;</code></pre>
+<pre class="r"><code>#體重中位數
+paste0(round(median(stat_5$WHD050)*0.45),&quot; KG&quot;) </code></pre>
+<pre><code>## [1] &quot;76 KG&quot;</code></pre>
+<pre class="r"><code>#整體資料
+summary(stat_5$WHD050)*0.45 </code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   27.00   63.00   76.50   79.23   90.00  270.00</code></pre>
+<pre class="r"><code>#今年和前一年比較
+ddt&lt;-cbind(stat_1$WHD020,stat_1$WHD050)
+ddt_1&lt;-subset(ddt,ddt[,1]&lt;=600,na.rm=TRUE)
+ddt_2&lt;-subset(ddt_1,ddt_1[,2]&lt;=600)*0.45
+summary(ddt_2)</code></pre>
+<pre><code>##        V1               V2        
+##  Min.   : 33.75   Min.   : 27.00  
+##  1st Qu.: 64.35   1st Qu.: 63.00  
+##  Median : 76.50   Median : 76.50  
+##  Mean   : 79.11   Mean   : 79.24  
+##  3rd Qu.: 90.00   3rd Qu.: 90.00  
+##  Max.   :270.00   Max.   :270.00</code></pre>
 </div>
-<div id="whd030" class="section level2">
-<h2>WHD030</h2>
+<div id="bmi" class="section level2">
+<h2>算BMI</h2>
+<p>使用資料：</p>
+<div id="whd010---current-self-reported-height-inches" class="section level3">
+<h3>WHD010 - Current self-reported height (inches)</h3>
+</div>
+<div id="whd020---current-self-reported-weight-pounds" class="section level3">
+<h3>WHD020 - Current self-reported weight (pounds)</h3>
+</div>
+<div id="whd050---self-reported-weight---1-yr-ago-pounds" class="section level3">
+<h3>WHD050 - Self-reported weight - 1 yr ago (pounds)</h3>
+<p>1 inch = 0.0254 m；1 pound = 0.45 KG BMI = 體重(kg)/身高(m)^2</p>
+<pre class="r"><code>dt&lt;-cbind(stat_1$WHD010,stat_1$WHD020) #算今年bmi
+dt_1_1&lt;-subset(dt,dt[,1]&lt;=84 &amp; dt[,2]&lt;=600,na.rm=TRUE)
+dt_1_1_1&lt;-dt_1_1[,1]*0.0254 #m
+dt_1_2_1&lt;-dt_1_1[,2]*0.45 #kg
+bmi_now&lt;-dt_1_2_1/(dt_1_1_1^2)
+summary(bmi_now)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   13.52   23.28   26.91   27.97   31.37   78.53</code></pre>
+<pre class="r"><code>dt1&lt;-cbind(stat_1$WHD010,stat_1$WHD050) #算前一年bmi
+dt_2_1&lt;-subset(dt1,dt1[,1]&lt;=84 &amp; dt[,2]&lt;=600,na.rm=TRUE)
+dt_2_1_1&lt;-dt_2_1[,1]*0.0254 #m
+dt_2_2_1&lt;-dt_2_1[,2]*0.45 #kg
+bmi_lastyr&lt;-dt_2_2_1/(dt_2_1_1^2)
+summary(bmi_lastyr)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   12.02   23.17   27.05   44.10   31.78 2003.54</code></pre>
+<p>用1yr ago跟now的BMI 選出1yr ago過重、肥胖的人、降低到正常體重的人，用降低幅度分組 [比如說 large weight loss (BMI change -5~-10) mild weight loss (BMI change -2~-5) 或是可以看那篇paper怎麼定義]</p>
+<pre class="r"><code>dif&lt;-bmi_now- bmi_lastyr
+paste0(&quot;large weight loss: &quot;,length(as.factor(subset(dif,dif&gt;=5))),&quot;人&quot;)</code></pre>
+<pre><code>## [1] &quot;large weight loss: 193人&quot;</code></pre>
+<pre class="r"><code>paste0(&quot;mild weight loss: &quot;,length(as.factor(subset(dif,dif&lt;5&amp; dif&gt;=2))),&quot;人&quot;)</code></pre>
+<pre><code>## [1] &quot;mild weight loss: 654人&quot;</code></pre>
+<pre class="r"><code>paste0(&quot;you are a big loser: &quot;,length(as.factor(subset(dif,dif&lt;2))),&quot;人&quot;)</code></pre>
+<pre><code>## [1] &quot;you are a big loser: 5228人&quot;</code></pre>
+</div>
+</div>
+<div id="whq030" class="section level2">
+<h2>WHQ030</h2>
 <div id="how-do-you-consider-your-weight" class="section level3">
 <h3>How do you consider your weight?</h3>
 <p>1 = Overweight 2 = Underweight, or 3 = About the right weight?</p>
@@ -399,7 +465,12 @@ paste0(round(mean(stat_2$WHD020)*0.45),&quot;KG&quot;) #體重平均值</code></
 <pre><code>## 
 ##    1    2    3    7    9 
 ## 3047  391 2872    1   16</code></pre>
-<pre class="r"><code>  #summary(as.factor(stat_1$WHQ030)) 也可以；將WHQ030從integer轉成factor(因為sum會把值加起來)</code></pre>
+<pre class="r"><code>  #summary(as.factor(stat_3$WHQ030)) 也可以；將WHQ030從integer轉成factor(因為sum會把值加起來)</code></pre>
+<p>WHQ040跟WHQ030相似</p>
+<pre class="r"><code>table(stat_1$WHQ040)</code></pre>
+<pre><code>## 
+##    1    2    3    7    9 
+##  611 3790 1922    1    3</code></pre>
 </div>
 </div>
 </div>

@@ -22,9 +22,10 @@ stat_1 <- read.xport(file.choose())
 ## WHD020
 取體重數值(單位：磅)，換算公斤（*0.45)
 ```{r}
-bodyweight<-stat_1$WHD020
-paste0(mean(bodyweight)*0.45,"KG") #已換算KG但我不知道怎麼把Current self-reported weight (pounds)消掉QQ
-paste0(median(bodyweight)*0.45,"KG")
+stat_2<-subset(stat_1, stat_1$WHD020<= 600,na.rm=TRUE)
+paste0(round(mean(stat_2$WHD020)*0.45),"KG") #體重平均值
+paste0(round(median(stat_2$WHD020)*0.45),"KG") #體重中位數
+summary(stat_2$WHD020)*0.45 #整體資料
 ```
 
 ## WHD030
@@ -33,8 +34,8 @@ paste0(median(bodyweight)*0.45,"KG")
 2 = Underweight, or
 3 = About the right weight?
 ```{r}
-library(plyr)
-
+table(stat_1$WHQ030)
+  #summary(as.factor(stat_1$WHQ030)) 也可以；將WHQ030從integer轉成factor(因為sum會把值加起來)
 
 ```
 

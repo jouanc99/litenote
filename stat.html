@@ -381,18 +381,25 @@ stat_1 &lt;- read.xport(file.choose())</code></pre>
 <div id="whd020" class="section level2">
 <h2>WHD020</h2>
 <p>取體重數值(單位：磅)，換算公斤（*0.45)</p>
-<pre class="r"><code>bodyweight&lt;-stat_1$WHD020
-paste0(mean(bodyweight)*0.45,&quot;KG&quot;) #已換算KG但我不知道怎麼把Current self-reported weight (pounds)消掉QQ</code></pre>
-<pre><code>## [1] &quot;158.691038406828KG&quot;</code></pre>
-<pre class="r"><code>paste0(median(bodyweight)*0.45,&quot;KG&quot;)</code></pre>
-<pre><code>## [1] &quot;76.5KG&quot;</code></pre>
+<pre class="r"><code>stat_2&lt;-subset(stat_1, stat_1$WHD020&lt;= 600,na.rm=TRUE)
+paste0(round(mean(stat_2$WHD020)*0.45),&quot;KG&quot;) #體重平均值</code></pre>
+<pre><code>## [1] &quot;79KG&quot;</code></pre>
+<pre class="r"><code>paste0(round(median(stat_2$WHD020)*0.45),&quot;KG&quot;) #體重中位數</code></pre>
+<pre><code>## [1] &quot;76KG&quot;</code></pre>
+<pre class="r"><code>summary(stat_2$WHD020)*0.45 #整體資料</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   33.75   64.35   76.50   79.07   90.00  270.00</code></pre>
 </div>
 <div id="whd030" class="section level2">
 <h2>WHD030</h2>
 <div id="how-do-you-consider-your-weight" class="section level3">
 <h3>How do you consider your weight?</h3>
 <p>1 = Overweight 2 = Underweight, or 3 = About the right weight?</p>
-<pre class="r"><code>library(plyr)</code></pre>
+<pre class="r"><code>table(stat_1$WHQ030)</code></pre>
+<pre><code>## 
+##    1    2    3    7    9 
+## 3047  391 2872    1   16</code></pre>
+<pre class="r"><code>  #summary(as.factor(stat_1$WHQ030)) 也可以；將WHQ030從integer轉成factor(因為sum會把值加起來)</code></pre>
 </div>
 </div>
 </div>

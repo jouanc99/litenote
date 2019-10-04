@@ -1,0 +1,42 @@
+---
+title: "stat"
+author: "Jouan"
+date: "2019/10/4"
+output: html_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# 統計數據
+資料：[weighthistory](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Questionnaire&CycleBeginYear=2015)
+
+[這個網頁有怎麼在R開.xpt檔的教學](https://www.phusewiki.org/wiki/index.php?title=Open_XPT_File_with_R)
+```{r}
+library(SASxport)
+setwd("C:/Users/Jouan/Desktop") #設在存統計xpt檔的位置
+  #dir() 可以輸入這個，會跑出檔案位置的所有檔案，從裡面複製貼到下面的read.xport()，好處就是不用每次knit都要重選檔案
+stat_1 <- read.xport(file.choose())
+```
+
+## WHD020
+取體重數值(單位：磅)，換算公斤（*0.45)
+```{r}
+bodyweight<-stat_1$WHD020
+paste0(mean(bodyweight)*0.45,"KG") #已換算KG但我不知道怎麼把Current self-reported weight (pounds)消掉QQ
+paste0(median(bodyweight)*0.45,"KG")
+```
+
+## WHD030
+### How do you consider your weight?
+1 = Overweight
+2 = Underweight, or
+3 = About the right weight?
+```{r}
+library(plyr)
+
+
+```
+
+
+

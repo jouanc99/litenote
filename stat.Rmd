@@ -64,19 +64,19 @@ summary(ddt_2)
 1 inch = 0.0254 m；1 pound = 0.45 KG
 BMI = 體重(kg)/身高(m)^2
 ```{r}
-dt<-cbind(stat_1$WHD010,stat_1$WHD020) #算今年bmi
-dt_1_1<-subset(dt,dt[,1]<=84 & dt[,2]<=600,na.rm=TRUE)
+dt<-cbind(stat_1$WHD010,stat_1$WHD020,stat_1$WHD050) #身高/今年體重/去年體重
+dt_1_1<-(subset(dt,dt[,1]<=84 & dt[,2]<=600 & dt[,3]<=600,na.rm=TRUE))
 dt_1_1_1<-dt_1_1[,1]*0.0254 #m
-dt_1_2_1<-dt_1_1[,2]*0.45 #kg
-bmi_now<-dt_1_2_1/(dt_1_1_1^2)
-summary(bmi_now)
+dt_1_1_2<-dt_1_1[,2]*0.45 #kg
+dt_1_1_3<-dt_1_1[,3]*0.45 #kg
+bmi_lastyr<-dt_1_1_3/(dt_1_1_1^2)
+bmi_now<-dt_1_1_2/(dt_1_1_1^2)
 
-dt1<-cbind(stat_1$WHD010,stat_1$WHD050) #算前一年bmi
-dt_2_1<-subset(dt1,dt1[,1]<=84 & dt[,2]<=600,na.rm=TRUE)
-dt_2_1_1<-dt_2_1[,1]*0.0254 #m
-dt_2_2_1<-dt_2_1[,2]*0.45 #kg
-bmi_lastyr<-dt_2_2_1/(dt_2_1_1^2)
-summary(bmi_lastyr)
+bmi_ok<-cbind(bmi_lastyr,bmi_now)
+bmi_ok_1<-subset(bmi_ok,bmi_ok[,1]>=20 & bmi_ok[,1]<=35 & bmi_ok[,2]>=20 & bmi_ok[,2]<=35) #篩掉>35的和過輕，不適合使用90 Days的
+bmi_ok<-as.data.frame(bmi_ok)
+bmi_ok_1<-as.data.frame(bmi_ok_1)
+summary(bmi_ok_1)
 
 ```
 
@@ -84,14 +84,25 @@ summary(bmi_lastyr)
 large weight loss (BMI change -5~-10)
 mild weight loss (BMI change -2~-5) 或是可以看那篇paper怎麼定義]
 ```{r}
-dif<-bmi_lastyr- bmi_now
+dif<-(bmi_ok_1$bmi_lastyr - bmi_ok_1$bmi_now)
 paste0("large weight loss: ",length(subset(dif,dif>=5)),"人")
 paste0("mild weight loss: ",length(subset(dif,dif<5& dif>=2)),"人")
 paste0("you are a big loser: ",length(subset(dif,dif<2)),"人")
 
 ```
 
+先轉成data frame
+```{r}
+dt_1_1_1<-as.data.frame(dt_1_1_1)
+dt_1_1_2<-as.data.frame(dt_1_1_2)
+dt_1_1_3<-as.data.frame(dt_1_1_3)
+dt_1_1<-as.data.frame(dt_1_1)
+dt<-data.frame(dt)
+bmi_lastyr<-data.frame(bmi_lastyr)
+bmi_now<-data.frame(bmi_now)
+dif<-data.frame(dif)
 
+```
 ## WHQ030
 ### How do you consider your weight?
 1 = Overweight
@@ -107,4 +118,56 @@ WHQ040跟WHQ030相似
 table(stat_1$WHQ040)
 ```
 
+## 回歸直線
+
+lm
+```{r}
+lmfit <- lm(bmi_ok_1$bmi_lastyr ~ bmi_ok_1$bmi_now,data=bmi_ok_1)
+summary(lmfit)
+names(lmfit) #residuals就是指殘差的值(coefficients代表係數)
+
+lmfit_s<-sample(lmfit$residuals,size=500,replace = TRUE)
+shapiro.test(lmfit_s) #函式可以用來檢驗殘差的常態性
+#由於虛無假設H0:殘差服從常態分配
+
+#畫出模型診斷用的圖
+library(ggfortify)
+autoplot(lmfit)
+
+plot(bmi_ok_1$bmi_lastyr ~ bmi_ok_1$bmi_now,data=bmi_ok_1)
+```
+
+```{r}
+bmi_d<-cbind(bmi_ok_1$bmi_lastyr ,dif)
+bmi_d<-as.data.frame(bmi_d)
+lmfit_1 <- lm(dif ~ bmi_ok_1$bmi_lastyr,data=bmi_d)
+summary(lmfit_1)
+names(lmfit_1) #residuals就是指殘差的值(coefficients代表係數)
+{plot(dif ~ bmi_ok_1$bmi_lastyr,data=bmi_d)+abline(lmfit_1,col="blue",lwd=3)}
+
+lmfit_s1<-sample(lmfit_1$residuals,size=500,replace = TRUE)
+shapiro.test(lmfit_s1) #函式可以用來檢驗殘差的常態性
+#由於虛無假設H0:殘差服從常態分配，因為p-value < 0.05，代表會拒絕H0
+
+#畫出模型診斷用的圖
+library(ggfortify)
+autoplot(lmfit_1)
+
+
+
+#diff<-subset(dif,dif>=5)
+#dt<-cbind(stat_1$WHD010,stat_1$WHD020,stat_1$WHD050) #身高/今年體重/去年體重
+#xx<-dt[,1]<=84
+#y<-dt[,3]<=600&dt[,2]<=600
+#x<-((dt[,3]-dt[,2])*0.45)/(xx/0.0254)
+#diff_1<-(subset(dt,dt[,1]<=84 & dt[,2]<=600 & dt[,3]<=600 & x>=5,na.rm=TRUE))
+
+
+#diff_1<-
+#as.data.frame(bmi_d1<-cbind(diff_1,diff))
+#diff<-as.data.frame(diff)
+#diff_1<-as.data.frame(diff_1)
+#lmfit_2 <- lm(diff_1 ~ diff,data=bmi_d1)
+
+```
 
